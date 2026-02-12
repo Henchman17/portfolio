@@ -11,6 +11,7 @@ interface CredentialItem {
   date?: string;
   year?: string;
   note?: string;
+  link?: string;
 }
 
 function Section({
@@ -25,13 +26,29 @@ function Section({
       <h2 className="text-xl font-semibold">{title}</h2>
       <div className="mt-4 grid gap-3">
         {items.map((i, idx) => (
-          <div key={idx} className="rounded-xl border border-neutral-200 p-4">
-            <div className="font-medium">{i.title || i.degree}</div>
-            <div className="text-sm text-neutral-600">
-              {[i.issuer || i.school, i.date || i.year].filter(Boolean).join(" • ")}
+          i.link ? (
+            <a
+              key={idx}
+              href={i.link}
+              target="_blank"
+              rel="noreferrer"
+              className="block rounded-xl border border-neutral-200 p-4 hover:bg-neutral-50 transition-colors cursor-pointer"
+            >
+              <div className="font-medium">{i.title || i.degree}</div>
+              <div className="text-sm text-neutral-600">
+                {[i.issuer || i.school, i.date || i.year].filter(Boolean).join(" • ")}
+              </div>
+              {i.note && <div className="text-sm text-neutral-700 mt-2">{i.note}</div>}
+            </a>
+          ) : (
+            <div key={idx} className="rounded-xl border border-neutral-200 p-4">
+              <div className="font-medium">{i.title || i.degree}</div>
+              <div className="text-sm text-neutral-600">
+                {[i.issuer || i.school, i.date || i.year].filter(Boolean).join(" • ")}
+              </div>
+              {i.note && <div className="text-sm text-neutral-700 mt-2">{i.note}</div>}
             </div>
-            {i.note && <div className="text-sm text-neutral-700 mt-2">{i.note}</div>}
-          </div>
+          )
         ))}
       </div>
     </div>

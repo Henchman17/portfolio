@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 export default function HomePage() {
   const [site, setSite] = useState<any>(null);
   const [projects, setProjects] = useState<any[]>([]);
+  const [credentials, setCredentials] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("posts");
   const [showMenu, setShowMenu] = useState(false);
@@ -15,14 +16,17 @@ export default function HomePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [siteRes, projectsRes] = await Promise.all([
+        const [siteRes, projectsRes, credentialsRes] = await Promise.all([
           fetch("/api/site"),
           fetch("/api/projects"),
+          fetch("/api/credentials"),
         ]);
         const siteData = await siteRes.json();
         const projectsData = await projectsRes.json();
+        const credentialsData = await credentialsRes.json();
         setSite(siteData);
         setProjects(Array.isArray(projectsData) ? projectsData : []);
+        setCredentials(credentialsData);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -279,46 +283,183 @@ export default function HomePage() {
 
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-4">
-            {/* Featured Projects Post */}
-            <div className="bg-white rounded-xl shadow-sm">
-              <div className="p-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-neutral-200 to-neutral-300 flex items-center justify-center text-sm font-bold text-neutral-500">
-                    {site?.name?.charAt(0)}
+            {activeTab === "posts" && (
+              <>
+                {/* Featured Projects Post */}
+                <div className="bg-white rounded-xl shadow-sm">
+                  <div className="p-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-neutral-200 to-neutral-300 flex items-center justify-center text-sm font-bold text-neutral-500">
+                        {site?.name?.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-neutral-900">{site?.name}</p>
+                        <p className="text-xs text-neutral-500">Just now · 🌎</p>
+                      </div>
+                    </div>
+                    <p className="text-neutral-800 mb-3">
+                      Check out my latest projects! 🚀 Here are some of my featured works.
+                    </p>
                   </div>
-                  <div>
-                    <p className="font-semibold text-neutral-900">{site?.name}</p>
-                    <p className="text-xs text-neutral-500">Just now · 🌎</p>
+                  
+                  {/* Projects Grid */}
+                  <div className="px-4 pb-4">
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {featured.map((p) => (
+                        <ProjectCard key={p.slug} p={p} />
+                      ))}
+                    </div>
                   </div>
                 </div>
-                <p className="text-neutral-800 mb-3">
-                  Check out my latest projects! 🚀 Here are some of my featured works.
-                </p>
-              </div>
-              
-              {/* Projects Grid */}
-              <div className="px-4 pb-4">
+
+                {/* Credentials Post */}
+                {credentials && (
+                  <div className="bg-white rounded-xl shadow-sm">
+                    <div className="p-4">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-neutral-200 to-neutral-300 flex items-center justify-center text-sm font-bold text-neutral-500">
+                          {site?.name?.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-neutral-900">{site?.name}</p>
+                          <p className="text-xs text-neutral-500">Just now · 🌎</p>
+                        </div>
+                      </div>
+                      <p className="text-neutral-800 mb-3">
+                        My credentials and certifications 📜
+                      </p>
+                    </div>
+                    
+                    {/* Credentials Content */}
+                    <div className="px-4 pb-4 space-y-4">
+                      {/* Education */}
+                      {credentials.education?.length > 0 && (
+                        <div>
+                          <h3 className="font-semibold text-neutral-900 mb-2">Education</h3>
+                          <div className="space-y-2">
+                            {credentials.education.map((edu: any, idx: number) => (
+                              <div key={idx} className="bg-neutral-50 rounded-lg p-3">
+                                <p className="font-medium text-neutral-800">{edu.degree}</p>
+                                <p className="text-sm text-neutral-600">{edu.school}</p>
+                                <p className="text-xs text-neutral-500">{edu.year}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Certifications */}
+                      {credentials.certifications?.length > 0 && (
+                        <div>
+                          <h3 className="font-semibold text-neutral-900 mb-2">Certifications</h3>
+                          <div className="space-y-2">
+                            {credentials.certifications.map((cert: any, idx: number) => (
+                              cert.link ? (
+                                <a
+                                  key={idx}
+                                  href={cert.link}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="block bg-neutral-50 hover:bg-neutral-100 rounded-lg p-3 transition-colors cursor-pointer"
+                                >
+                                  <p className="font-medium text-neutral-800">{cert.title}</p>
+                                  <p className="text-sm text-neutral-600">{cert.issuer}</p>
+                                  <p className="text-xs text-neutral-500">{cert.date}</p>
+                                </a>
+                              ) : (
+                                <div key={idx} className="bg-neutral-50 rounded-lg p-3">
+                                  <p className="font-medium text-neutral-800">{cert.title}</p>
+                                  <p className="text-sm text-neutral-600">{cert.issuer}</p>
+                                  <p className="text-xs text-neutral-500">{cert.date}</p>
+                                </div>
+                              )
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Skills */}
+                      {credentials.skills?.length > 0 && (
+                        <div>
+                          <h3 className="font-semibold text-neutral-900 mb-2">Skills</h3>
+                          <div className="flex flex-wrap gap-2">
+                            {credentials.skills.flatMap((skill: any) => skill.items).map((item: string, idx: number) => (
+                              <span key={idx} className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
+                                {item}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* See All Projects Link */}
+                <div className="text-center py-4">
+                  <Link 
+                    href="/projects" 
+                    className="inline-flex items-center gap-2 text-blue-600 hover:underline font-medium"
+                  >
+                    See all projects
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                </div>
+              </>
+            )}
+
+            {activeTab === "about" && (
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <h2 className="text-xl font-bold text-neutral-900 mb-4">About Me</h2>
+                <p className="text-neutral-700 mb-6">{site?.shortBio}</p>
+                
                 <div className="grid gap-4 md:grid-cols-2">
-                  {featured.map((p) => (
-                    <ProjectCard key={p.slug} p={p} />
-                  ))}
+                  <div className="bg-neutral-50 rounded-lg p-4">
+                    <h3 className="font-semibold text-neutral-900 mb-2">Location</h3>
+                    <p className="text-neutral-600">{site?.location}</p>
+                  </div>
+                  <div className="bg-neutral-50 rounded-lg p-4">
+                    <h3 className="font-semibold text-neutral-900 mb-2">Work</h3>
+                    <p className="text-neutral-600">{site?.profile?.work}</p>
+                  </div>
+                  <div className="bg-neutral-50 rounded-lg p-4">
+                    <h3 className="font-semibold text-neutral-900 mb-2">Education</h3>
+                    <p className="text-neutral-600">{site?.profile?.education}</p>
+                  </div>
+                  <div className="bg-neutral-50 rounded-lg p-4">
+                    <h3 className="font-semibold text-neutral-900 mb-2">Joined</h3>
+                    <p className="text-neutral-600">{site?.profile?.joined}</p>
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <h3 className="font-semibold text-neutral-900 mb-3">Contact</h3>
+                  <a href={`mailto:${site?.email}`} className="text-blue-600 hover:underline">
+                    {site?.email}
+                  </a>
                 </div>
               </div>
+            )}
 
-            </div>
-
-            {/* See All Projects Link */}
-            <div className="text-center py-4">
-              <Link 
-                href="/projects" 
-                className="inline-flex items-center gap-2 text-blue-600 hover:underline font-medium"
-              >
-                See all projects
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-            </div>
+            {activeTab === "projects" && (
+              <>
+                <div className="bg-white rounded-xl shadow-sm p-4">
+                  <h2 className="text-xl font-bold text-neutral-900 mb-4">All Projects</h2>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {projects.map((p) => (
+                      <ProjectCard key={p.slug || p._id} p={p} />
+                    ))}
+                  </div>
+                </div>
+                {projects.length === 0 && (
+                  <div className="bg-white rounded-xl shadow-sm p-8 text-center">
+                    <p className="text-neutral-500">No projects yet. Check back soon!</p>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </div>
       </Container>

@@ -6,9 +6,6 @@ export default function ResumePage() {
     <Container>
       <section className="py-12">
         <h1 className="text-3xl font-semibold">Resume</h1>
-        <p className="text-neutral-600 mt-2">
-          Replace <code>public/resume.pdf</code> with your real resume.
-        </p>
 
         <div className="mt-6 flex gap-2">
           <a className="btn btn-primary" href={site.resumePath} download>

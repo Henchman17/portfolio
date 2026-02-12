@@ -223,25 +223,27 @@ export default function SiteEditor() {
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border px-3 py-2"
               />
             </div>
-            <div>
+            <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700">
                 Work
               </label>
-              <input
-                type="text"
+              <textarea
+                rows={4}
                 value={site.profile?.work || ""}
                 onChange={(e) => handleProfileChange("work", e.target.value)}
+                placeholder="Describe your work experience, current position, responsibilities..."
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border px-3 py-2"
               />
             </div>
-            <div>
+            <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700">
                 Education
               </label>
-              <input
-                type="text"
+              <textarea
+                rows={4}
                 value={site.profile?.education || ""}
                 onChange={(e) => handleProfileChange("education", e.target.value)}
+                placeholder="Describe your educational background, degrees, achievements..."
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border px-3 py-2"
               />
             </div>
